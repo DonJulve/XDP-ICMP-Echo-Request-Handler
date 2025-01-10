@@ -13,10 +13,10 @@ struct custom_icmpv6hdr {
     __u8 icmp6_code;      // ICMPv6 code
     __u16 icmp6_cksum;    // ICMPv6 checksum
     union {
-        __u32 icmp6_custom_identifier;  // Cambiar nombre para evitar conflicto
-        __u32 icmp6_custom_reserved;    // Cambiar nombre para evitar conflicto
+        __u32 icmp6_custom_identifier;
+        __u32 icmp6_custom_reserved;
     };
-    __u32 icmp6_custom_sequence;        // Cambiar nombre para evitar conflicto
+    __u32 icmp6_custom_sequence;
 };
 
 SEC("xdp")
@@ -50,12 +50,12 @@ int xdp_icmp_echo(struct xdp_md *ctx) {
             ip->daddr = tmp_ip;
 
             // Cambiar tipo de ICMP: ICMP_ECHOREPLY
-            __u16 old_csum = icmp->checksum;
+            __u16 old_type = icmp->type;
             icmp->type = ICMP_ECHOREPLY;
 
             // Actualizar checksum (RFC 1624)
-            __u32 csum_diff = bpf_csum_diff((__be32 *)&old_csum, 2, (__be32 *)&icmp->checksum, 2, 0);
-            icmp->checksum += csum_diff;
+            __u32 csum_diff = bpf_csum_diff((__be32 *)&old_type, sizeof(old_type), (__be32 *)&icmp->type, sizeof(icmp->type), 0);
+            icmp->checksum = ~((~icmp->checksum) + csum_diff);
 
             return XDP_TX;
         }
@@ -78,12 +78,12 @@ int xdp_icmp_echo(struct xdp_md *ctx) {
             __builtin_memcpy(&ipv6->daddr, tmp_ip6, 16);
 
             // Cambiar tipo de ICMPv6: ICMPV6_ECHO_REPLY
-            __u16 old_csumv6 = icmpv6->icmp6_cksum;
+            __u16 old_type_v6 = icmpv6->icmp6_type;
             icmpv6->icmp6_type = ICMPV6_ECHO_REPLY;
 
             // Actualizar checksum para ICMPv6 (RFC 1624)
-            __u32 csum_diff_v6 = bpf_csum_diff((__be32 *)&old_csumv6, 2, (__be32 *)&icmpv6->icmp6_cksum, 2, 0);
-            icmpv6->icmp6_cksum += csum_diff_v6;
+            __u32 csum_diff_v6 = bpf_csum_diff((__be32 *)&old_type_v6, sizeof(old_type_v6), (__be32 *)&icmpv6->icmp6_type, sizeof(icmpv6->icmp6_type), 0);
+            icmpv6->icmp6_cksum = ~((~icmpv6->icmp6_cksum) + csum_diff_v6);
 
             return XDP_TX;
         }
