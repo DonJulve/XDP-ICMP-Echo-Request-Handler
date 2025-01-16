@@ -1,13 +1,22 @@
 ---
-title: "Sistemas Empotrados 2"
-subtitle: "Implementación de un Echo Server en XDP con una BBB"
-author: "Nombre: Javier Julve Yubero NIP: 840710"
-date: "Nombre: Javier Falcó Díez NIP: 797613"
-geometry: a4paper, top=10cm
+geometry: a4paper
 fontsize: 12pt
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{float}
 ---
 
----
+\begin{titlepage}
+\centering
+{\Huge \textbf{Sistemas Empotrados 2}} \\[2.5cm]
+{\LARGE Implementación de un Echo Server en XDP con una BBB} \\[1.5cm]
+\includegraphics[width=0.4\textwidth]{fotos/Logo.jpeg} \\[3cm]
+{\Large \textbf{Autores:}} \\[0.5cm]
+{\Large Javier Julve Yubero - NIP: 840710} \\
+{\Large Javier Falcó Díez - NIP: 797613} \\[2cm]
+{\Large \textbf{Fecha:}} \\[0.5cm]
+{\Large 16 de enero de 2025} \\[4cm]
+\end{titlepage}
 
 \newgeometry{top=3cm}
 # Introducción
@@ -26,7 +35,14 @@ sudo apt install bbb.io-kernel-5.10-ti-rt-am335x
 ```
 Reiniciamos el sistema para que los cambios surtan efecto.
 
-# Configuración de red (uso de usb para red)
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{fotos/Diagrama_hardware.jpeg}
+    \caption{Diagrama de conexiones hardware}
+    \label{fig:diagrama_hardware}
+\end{figure}
+
+# Configuración de red
 
 Para conectar la BBB a internet y al portátil hemos usado el cable de USB, no hemos usado los cables Ethernet. Hemos configurado el portátil para que haga forwarding de paquetes y usando iptables hemos puesto reglas para que funcione como un router para la BBB. Hemos configurado la BBB para que usara el portátil como gateway y le hemos agregado una dirección para uso de DNS. Esto ha servido para facilitar instalar utilidades en la BBB cómodamente, trabajar con git y comprobar que teníamos conexión con el exterior. 
 Para IPv6 le hemos dado una dirección global a la BBB y la hemos configurado para que la salida por defecto sea la interfaz conectada por USB.
@@ -52,29 +68,52 @@ Así es fácil reconocer errores de en la forma de parseo y filtrado con XDP, po
 ```bash
 sudo tcpdump -i nombre_interfaz icmp
 ```
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{fotos/Diagrama_red.jpeg}
+    \caption{Diagrama de conexiones de red}
+    \label{fig:diagrama_red}
+\end{figure}
 
 # Imágenes
 
-## Wireshark sin xdp
-![Wireshark sin xdp](fotos/Wireshark_sin_xdp.png)
-<br>
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{fotos/Wireshark_sin_xdp.png}
+    \caption{Captura de Wireshark sin XDP en el PC}
+    \label{fig:wireshark_sin_xdp}
+\end{figure}
 
-## Tcpdump con xdp
-![Tcpdump sin xdp](fotos/Tcpdump_sin_xdp.png)
-<br>
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{fotos/Tcpdump_sin_xdp.png}
+    \caption{Captura de Tcpdump sin XDP en la BBB}
+    \label{fig:tcpdump_sin_xdp}
+\end{figure}
 
-## Wireshark con xdp
-![Wireshark con xdp](fotos/Wireshark_con_xdp.png)
-<br>
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{fotos/Wireshark_con_xdp.png}
+    \caption{Captura de Wireshark con XDP en el PC}
+    \label{fig:wireshark_con_xdp}
+\end{figure}
 
-## Tcpdump con xdp
-![Tcpdump con xdp](fotos/Tcpdump_con_xdp.png)
-<br>
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{fotos/Tcpdump_con_xdp.png}
+    \caption{Captura de Tcpdump con XDP en la BBB}
+    \label{fig:tecpdump_con_xdp}
+\end{figure}
+
 
 # Conclusión
 Trabajar con este proyecto nos ha permitido ver cómo XDP puede ser una herramienta poderosa para personalizar el comportamiento de la red en el kernel, y cómo hacerlo requiere un profundo entendimiento de las capas de red y las estructuras de datos en C. Esto nos ha enseñado cómo podría aplicarse XDP en otros contextos, como la seguridad o el monitoreo de redes.
 
-# README
+\vspace{2cm}
+\begin{center}
+\Huge \textbf{README}
+\end{center}
+
 ## XDP ICMP Echo Request Handler
 Este programa utiliza XDP (eBPF) para interceptar y modificar paquetes de red ICMP y ICMPv6. Su objetivo es interceptar solicitudes de eco ICMP (ping) y ICMPv6, intercambiando las direcciones de origen y destino, y modificando el tipo del mensaje a la respuesta de eco correspondiente.
 
